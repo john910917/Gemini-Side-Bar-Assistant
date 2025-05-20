@@ -1,4 +1,5 @@
 <h1 align="center">Gemini Side Bar Assistant</h1>
+
 # 步驟1
 至Chrome瀏覽器中
 按下右上角的三個點點
