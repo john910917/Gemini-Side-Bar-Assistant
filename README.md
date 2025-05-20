@@ -1,7 +1,7 @@
 <h1 align="center">Gemini Side Bar Assistant</h1>
 
 # 步驟1
-至Chrome瀏覽器中 /n
+至Chrome瀏覽器中 \n
 按下右上角的三個點點
 按下擴充功能=>管理擴充功能
 進入管理擴充功能頁面後
