@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="sidepanel.css">
+  <link rel="stylesheet" href="github-dark.min.css">
+  <!-- 使用本地的 QR Code 掃描庫 -->
+  <script src="qr-scanner.min.js"></script>
+  <script src="highlight.min.js"></script>
+</head>
+<body>
+  <div class="container">
+    <!-- 主要聊天區域 -->
+    <div class="chat-interface">
+      <div class="chat-header">
+        <div class="chat-title">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/>
+          </svg>
+          <span>Gemini Assistant</span>
+        </div>
+        <div class="header-buttons">
+          <button id="settingsButton" class="icon-button" title="設定">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+              <path d="M8 0a8 8 0 100 16A8 8 0 008 0zm0 14.5a6.5 6.5 0 110-13 6.5 6.5 0 010 13zm0-11a4.5 4.5 0 100 9 4.5 4.5 0 000-9zm0 7a2.5 2.5 0 110-5 2.5 2.5 0 010 5z"/>
+            </svg>
+          </button>
+          <button id="clearChat" class="icon-button" title="清除對話">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+              <path d="M2 4h12v1H2zm3 3h6v1H5zm0 3h6v1H5z"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="chat-messages" id="chatMessages"></div>
+
+      <div class="input-container">
+        <div class="input-wrapper">
+          <button id="uploadButton" class="icon-button" title="上傳檔案">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+              <path d="M8 12L3 7h3V1h4v6h3L8 12z"/>
+              <path d="M14 14H2v-3h2v1h8v-1h2v3z"/>
+            </svg>
+          </button>
+          <button id="screenshotButton" class="icon-button" title="截圖">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+              <path d="M0 3a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3zm2-1a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1H2z"/>
+              <path d="M8 6.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zM4 7h8v5H4V7z"/>
+            </svg>
+          </button>
+          <textarea 
+            id="userInput" 
+            placeholder="輸入訊息或使用 / 來查看命令..."
+            rows="1"
+          ></textarea>
+          <button id="sendButton" class="send-button">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+              <path d="M15 2l-4 12-1.5-5.5L4 7z"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 設定對話框 -->
+  <div id="settingsModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>設定</h2>
+        <button id="closeSettings" class="icon-button">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+            <path d="M3.72 3.72a.75.75 0 011.06 0L8 6.94l3.22-3.22a.75.75 0 111.06 1.06L9.06 8l3.22 3.22a.75.75 0 11-1.06 1.06L8 9.06l-3.22 3.22a.75.75 0 01-1.06-1.06L6.94 8 3.72 4.78a.75.75 0 010-1.06z"/>
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="setting-item">
+          <label for="modalApiKey">API 金鑰</label>
+          <div class="input-group">
+            <input type="password" id="modalApiKey" placeholder="請輸入 Gemini API 金鑰">
+            <button id="showModalApiKey" class="icon-button" title="顯示/隱藏 API 金鑰">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                <path d="M8 2C3 2 0 8 0 8s3 6 8 6 8-6 8-6-3-6-8-6zm0 10c-2.7 0-5-2.3-5-5s2.3-5 5-5 5 2.3 5 5-2.3 5-5 5z"/>
+                <circle cx="8" cy="8" r="2"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+        <div class="setting-item">
+          <label>Language</label>
+          <div class="language-options">
+            <label class="radio-label">
+              <input type="radio" name="modalLanguage" value="zh-TW" checked>
+              <span>繁體中文</span>
+            </label>
+            <label class="radio-label">
+              <input type="radio" name="modalLanguage" value="en">
+              <span>English</span>
+            </label>
+            <label class="radio-label">
+              <input type="radio" name="modalLanguage" value="ja">
+              <span>日本語</span>
+            </label>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="saveModalSettings" class="primary-button">儲存設定</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 添加隱藏的檔案輸入元素 -->
+  <input type="file" id="fileInput" style="display: none" multiple>
+
+  <script src="sidepanel.js"></script>
+</body>
+</html> 

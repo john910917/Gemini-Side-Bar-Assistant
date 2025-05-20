@@ -1,0 +1,36 @@
+{
+  "manifest_version": 3,
+  "name": "Gemini AI",
+  "version": "1.0",
+  "description": "基於 Gemini 的智能聊天助手",
+  "permissions": [
+    "storage",
+    "sidePanel",
+    "activeTab",
+    "scripting",
+    "tabs",
+    "desktopCapture"
+  ],
+  "host_permissions": [
+    "https://generativelanguage.googleapis.com/",
+    "<all_urls>"
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_icon": {
+      "128": "images/icon128.png"
+    }
+  },
+  "side_panel": {
+    "default_path": "sidepanel.html"
+  },
+  "web_accessible_resources": [{
+    "resources": ["html2canvas.min.js"],
+    "matches": ["<all_urls>"]
+  }]
+} 

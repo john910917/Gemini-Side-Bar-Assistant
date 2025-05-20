@@ -1,0 +1,422 @@
+:root {
+  --primary-color: #1f6feb;
+  --bg-color: #0d1117;
+  --text-color: #c9d1d9;
+  --border-color: #30363d;
+  --hover-bg: #161b22;
+  --message-bg: #1b1f24;
+  --user-message-bg: #2d333b;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+}
+
+.container {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* API Key 區域樣式 */
+.api-key-section {
+  padding: 16px;
+  background-color: var(--message-bg);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.section-header h2 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.input-group {
+  display: flex;
+  gap: 8px;
+}
+
+#apiKeyInput {
+  flex: 1;
+  padding: 6px 12px;
+  background-color: var(--bg-color);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  color: var(--text-color);
+}
+
+/* 聊天介面樣式 */
+.chat-interface {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.chat-header {
+  padding: 12px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.chat-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+}
+
+.chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+}
+
+.message {
+  margin: 8px 0;
+  padding: 12px;
+  border-radius: 6px;
+  max-width: 85%;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+.user-message {
+  background-color: var(--user-message-bg);
+  margin-left: auto;
+}
+
+.bot-message {
+  background-color: var(--message-bg);
+  margin-right: auto;
+}
+
+.input-container {
+  padding: 16px;
+  background-color: var(--message-bg);
+  border-top: 1px solid var(--border-color);
+}
+
+.input-wrapper {
+  display: flex;
+  gap: 8px;
+  background-color: var(--bg-color);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 8px;
+}
+
+#userInput {
+  flex: 1;
+  background: none;
+  border: none;
+  color: var(--text-color);
+  resize: none;
+  padding: 0;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+#userInput:focus {
+  outline: none;
+}
+
+.suggestion-chips {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+
+.chip {
+  background: var(--hover-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 4px 12px;
+  font-size: 12px;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.chip:hover {
+  background: var(--message-bg);
+}
+
+/* 按鈕樣式 */
+.primary-button {
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.primary-button:hover {
+  opacity: 0.9;
+}
+
+.icon-button {
+  background: none;
+  border: none;
+  color: var(--text-color);
+  padding: 4px;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.icon-button:hover {
+  background-color: var(--hover-bg);
+}
+
+.send-button {
+  background: none;
+  border: none;
+  color: var(--primary-color);
+  padding: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+/* 載入指示器樣式 */
+#loading-indicator {
+  background-color: var(--message-bg);
+  font-style: italic;
+  color: #8b949e;
+}
+
+/* 狀態訊息樣式 */
+.status-message {
+  margin-top: 8px;
+  font-size: 12px;
+}
+
+.status-message.success {
+  color: #3fb950;
+}
+
+.status-message.error {
+  color: #f85149;
+}
+
+/* 添加到現有的 CSS 文件中 */
+
+.header-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+/* 模態對話框樣式 */
+.modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+}
+
+.modal.show {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-content {
+  background-color: var(--bg-color);
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  width: 90%;
+  max-width: 400px;
+}
+
+.modal-header {
+  padding: 16px;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-header h2 {
+  margin: 0;
+  font-size: 16px;
+}
+
+.modal-body {
+  padding: 16px;
+}
+
+.modal-footer {
+  padding: 16px;
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* 設定項目樣式 */
+.setting-item {
+  margin-bottom: 20px;
+}
+
+.setting-item:last-child {
+  margin-bottom: 0;
+}
+
+.setting-item label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+
+/* 程式碼區塊樣式 */
+.message pre {
+  background-color: var(--bg-color);
+  border-radius: 6px;
+  padding: 12px;
+  margin: 8px 0;
+  overflow-x: auto;
+}
+
+.message code {
+  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+  font-size: 0.9em;
+}
+
+/* 行內程式碼樣式 */
+.message :not(pre) > code {
+  background-color: var(--bg-color);
+  padding: 2px 4px;
+  border-radius: 4px;
+}
+
+/* 列表樣式 */
+.message ul {
+  margin: 8px 0;
+  padding-left: 20px;
+}
+
+.message li {
+  margin: 4px 0;
+}
+
+/* 標題樣式 */
+.message h1 {
+  font-size: 1.5em;
+  margin: 16px 0 8px 0;
+}
+
+.message h2 {
+  font-size: 1.3em;
+  margin: 14px 0 7px 0;
+}
+
+.message h3 {
+  font-size: 1.1em;
+  margin: 12px 0 6px 0;
+}
+
+/* 強調文字樣式 */
+.message strong {
+  font-weight: 600;
+}
+
+.message em {
+  font-style: italic;
+}
+
+/* 在現有的 CSS 中添加 */
+#uploadButton {
+  padding: 4px;
+  color: var(--text-color);
+  opacity: 0.8;
+  transition: opacity 0.2s;
+}
+
+#uploadButton:hover {
+  opacity: 1;
+}
+
+/* 圖片預覽樣式 */
+.message img {
+  max-width: 100%;
+  border-radius: 4px;
+  margin: 8px 0;
+}
+
+/* 圖片預覽容器 */
+.image-preview {
+  margin: 10px 0;
+  max-width: 100%;
+  border-radius: 6px;
+  overflow: hidden;
+  background-color: var(--bg-color);
+  border: 1px solid var(--border-color);
+}
+
+/* 圖片樣式 */
+.image-preview img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 0;
+}
+
+/* QR 碼容器 */
+.qr-code {
+  margin: 10px 0;
+  border-radius: 6px;
+  overflow: hidden;
+  background-color: var(--bg-color);
+  border: 1px solid var(--border-color);
+}
+
+/* QR 碼圖片 */
+.qr-code img {
+  display: block;
+  max-width: 200px;
+  height: auto;
+  margin: 0 auto;
+  padding: 10px;
+}
+
+/* QR 碼內容區域 */
+.qr-content {
+  padding: 10px;
+  border-top: 1px solid var(--border-color);
+  background-color: var(--message-bg);
+}
+
+/* QR 碼標籤 */
+.qr-label {
+  margin: 0 0 4px 0;
+  font-size: 12px;
+  color: var(--text-color);
+  opacity: 0.8;
+}
+
+/* QR 碼文字 */
+.qr-text {
+  margin: 0;
+  word-break: break-all;
+  font-family: monospace;
+  white-space: pre-wrap;
+}

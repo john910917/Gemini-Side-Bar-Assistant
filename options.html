@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>AI 聊天助手設定</title>
+  <link rel="stylesheet" href="options.css">
+</head>
+<body>
+  <div class="container">
+    <h1>AI 聊天助手設定</h1>
+    
+    <section class="settings-section">
+      <h2>API 設定</h2>
+      <div class="setting-item">
+        <label for="apiKey">Gemini API 金鑰</label>
+        <div class="input-group">
+          <input type="password" id="apiKey" placeholder="請輸入 API 金鑰">
+          <button id="showApiKey" class="icon-button" title="顯示/隱藏 API 金鑰">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+              <path d="M8 2C3 2 0 8 0 8s3 6 8 6 8-6 8-6-3-6-8-6zm0 10c-2.7 0-5-2.3-5-5s2.3-5 5-5 5 2.3 5 5-2.3 5-5 5z"/>
+              <circle cx="8" cy="8" r="2"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <section class="settings-section">
+      <h2>語言設定</h2>
+      <div class="setting-item">
+        <label>介面語言</label>
+        <div class="language-options">
+          <label class="radio-label">
+            <input type="radio" name="language" value="zh-TW" checked>
+            <span>繁體中文</span>
+          </label>
+          <label class="radio-label">
+            <input type="radio" name="language" value="en">
+            <span>English</span>
+          </label>
+          <label class="radio-label">
+            <input type="radio" name="language" value="ja">
+            <span>日本語</span>
+          </label>
+        </div>
+      </div>
+    </section>
+
+    <div class="actions">
+      <button id="saveSettings" class="primary-button">儲存設定</button>
+      <div id="status" class="status-message"></div>
+    </div>
+  </div>
+  </div>
+  <script src="options.js"></script>
+</body>
+</html> 
