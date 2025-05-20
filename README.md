@@ -1,4 +1,4 @@
-# Gemini-Side-Bar-Assistant
+<h1 align="center">Gemini-Side-Bar-Assistant</h1>
 
 下載完成後將下載的檔案資料夾中新增images資料夾
 將icon128.png放入images資料夾中
