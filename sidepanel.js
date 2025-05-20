@@ -673,7 +673,8 @@ class ChatBot {
     messageDiv.classList.add('message', `${sender}-message`);
     
     if (sender === 'bot') {
-      const formattedMessage = this.formatBotMessage(message);
+      let cleanMessage = message.replace(/^Assistant:\s*/i, '');
+      const formattedMessage = this.formatBotMessage(cleanMessage);
       messageDiv.innerHTML = formattedMessage;
     } else {
       if (message.includes('<div class="image-preview">')) {
