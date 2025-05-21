@@ -817,54 +817,113 @@ class ChatBot {
       if (files.length === 0) return;
 
       for (const file of files) {
+        // 檔案大小限制 5MB
+        if (file.size > 5 * 1024 * 1024) {
+          this.addMessageToChat(`❌ 檔案「${file.name}」超過 5MB，請選擇較小的檔案。`, 'bot');
+          continue;
+        }
+        // 顯示 loading 狀態
+        const loadingId = `loading-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`;
+        this.addFileLoadingIndicator(file, loadingId);
         try {
-          const content = await this.readFileContent(file);
-          const message = await this.createFileMessage(file, content);
-          this.addMessageToChat(message, 'user');
-          
+          const content = await this.readFileContentEnhanced(file);
+          // --- 修改：圖片預覽與分析分開 ---
           if (content.type === 'image') {
-            const imageData = await this.processImageWithCanvas(content.data);
-            
-            const response = await this.getLLMResponse(
-              `請詳細分析這張圖片的內容，包含以下幾個方面：
-
-              1. 圖片顯示的內容：
-              - 整體畫面呈現什麼？
-              - 主要元素有哪些？
-              - 畫面的排版和布局如何？
-              - 使用了什麼顏色和風格？
-
-              2. 重要的文字、數據或資訊：
-              - 有哪些關鍵文字或標題？
-              - 包含什麼重要數據或資訊？
-              - 是否有特殊的符號或標記？
-              - 文字的排版和呈現方式如何？
-
-              3. 如果是網頁截圖：
-              - 這是什麼類型的網頁？
-              - 頁面的主要功能是什麼？
-              - 有哪些互動元素？
-              - UI/UX 設計的特點是什麼？
-
-              4. 如果包含程式碼：
-              - 使用什麼程式語言？
-              - 程式碼的主要功能是什麼？
-              - 有哪些關鍵的程式碼片段？
-              - 程式碼的結構和邏輯如何？
-
-              請用專業且詳細的方式分析，並保持條理清晰的敘述。
-              ${imageData}`
+            // 1. 先顯示圖片預覽
+            this.addMessageToChat(
+              `<div class="image-preview"><img src="${content.data}" alt="${this.escapeHtml(content.name)}" /></div>`,
+              'user'
             );
+            // 2. 顯示分析中
+            this.addMessageToChat('圖片分析中...', 'bot');
+            // 3. 分析
+            const imageData = await this.processImageWithCanvas(content.data);
+            const response = await this.getLLMResponse(imageData);
             this.addMessageToChat(response, 'bot');
+            // 移除 loading
+            this.replaceFileLoadingIndicator(loadingId, '', 'user');
+          } else {
+            // 非圖片，照原本流程
+            const message = await this.createFileMessageEnhanced(file, content);
+            this.replaceFileLoadingIndicator(loadingId, message, 'user');
           }
         } catch (error) {
-          console.error('處理檔案時發生錯誤:', error);
-          this.addMessageToChat(`處理檔案 "${file.name}" 時發生錯誤`, 'bot');
+          this.replaceFileLoadingIndicator(loadingId, `❌ 檔案「${file.name}」處理失敗：${error.message}`, 'bot');
         }
       }
-      
       this.fileInput.value = '';
     });
+  }
+
+  // 新增：支援更多格式與安全處理
+  async readFileContentEnhanced(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        // 圖片
+        if (file.type.startsWith('image/')) {
+          resolve({ type: 'image', data: e.target.result, name: file.name });
+        // 純文字/程式碼
+        } else if (file.type.startsWith('text/') || file.type === 'application/json' || file.type === 'application/javascript' || file.name.match(/\.(txt|js|json|css|html|md|py|java|cpp|c|rb|php)$/i)) {
+          resolve({ type: 'text', data: e.target.result, name: file.name });
+        // PDF
+        } else if (file.type === 'application/pdf' || file.name.match(/\.pdf$/i)) {
+          resolve({ type: 'pdf', name: file.name, size: file.size });
+        // Word
+        } else if (file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' || file.name.match(/\.docx?$/i)) {
+          resolve({ type: 'word', name: file.name, size: file.size });
+        // Excel
+        } else if (file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' || file.name.match(/\.xlsx?$/i)) {
+          resolve({ type: 'excel', name: file.name, size: file.size });
+        } else {
+          reject(new Error('不支援的檔案類型'));
+        }
+      };
+      reader.onerror = (error) => reject(error);
+      if (file.type.startsWith('image/')) {
+        reader.readAsDataURL(file);
+      } else if (file.type.startsWith('text/') || file.type === 'application/json' || file.type === 'application/javascript' || file.name.match(/\.(txt|js|json|css|html|md|py|java|cpp|c|rb|php)$/i)) {
+        reader.readAsText(file);
+      } else {
+        // 其他格式不需讀內容
+        reader.onload({ target: { result: null } });
+      }
+    });
+  }
+
+  // 新增：根據格式產生訊息
+  async createFileMessageEnhanced(file, content) {
+    const fileSize = this.formatFileSize(file.size);
+    let message = `\uD83D\uDCC4 <strong>${this.escapeHtml(file.name)}</strong> (${fileSize})`;
+    if (content.type === 'image') {
+      message += `<div class="image-preview"><img src=\"${content.data}\" alt=\"${this.escapeHtml(content.name)}\" /></div>`;
+    } else if (content.type === 'text') {
+      message += `<pre><code>${this.escapeHtml(content.data)}</code></pre>`;
+    } else if (content.type === 'pdf') {
+      message += '<br>PDF 檔案，暫不支援預覽。';
+    } else if (content.type === 'word') {
+      message += '<br>Word 檔案，暫不支援預覽。';
+    } else if (content.type === 'excel') {
+      message += '<br>Excel 檔案，暫不支援預覽。';
+    }
+    return message;
+  }
+
+  // 新增：檔案 loading 狀態
+  addFileLoadingIndicator(file, loadingId) {
+    const loadingDiv = document.createElement('div');
+    loadingDiv.id = loadingId;
+    loadingDiv.classList.add('message', 'user-message', 'file-loading');
+    loadingDiv.innerHTML = `<span class="spinner"></span> 上傳「${this.escapeHtml(file.name)}」中...`;
+    this.chatMessages.appendChild(loadingDiv);
+    this.chatMessages.scrollTop = this.chatMessages.scrollHeight;
+  }
+  replaceFileLoadingIndicator(loadingId, message, sender) {
+    const loadingDiv = document.getElementById(loadingId);
+    if (loadingDiv) {
+      loadingDiv.className = `message ${sender}-message`;
+      loadingDiv.innerHTML = message;
+    }
   }
 
   async processImageWithCanvas(imageDataUrl) {
@@ -903,58 +962,6 @@ class ChatBot {
     });
   }
 
-  async readFileContent(file) {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      
-      reader.onload = async (e) => {
-        if (file.type.startsWith('image/')) {
-          resolve({
-            type: 'image',
-            data: e.target.result,
-            name: file.name
-          });
-        } else if (file.type.startsWith('text/') || 
-                  file.type === 'application/json' ||
-                  file.type === 'application/javascript' ||
-                  file.name.match(/\.(txt|js|json|css|html|md|py|java|cpp|c|rb|php)$/i)) {
-          resolve({
-            type: 'text',
-            data: e.target.result
-          });
-        } else {
-          const supportedTypes = ['image/*', 'text/*', '.js', '.json', '.css', '.html', '.md', '.py', '.java', '.cpp', '.c', '.rb', '.php'];
-          reject(new Error(`不支援的檔案類型: ${file.type || '未知'}。目前支援：${supportedTypes.join(', ')}`));
-        }
-      };
-      
-      reader.onerror = (error) => reject(error);
-
-      if (file.type.startsWith('image/')) {
-        reader.readAsDataURL(file);
-      } else {
-        reader.readAsText(file);
-      }
-    });
-  }
-
-  async createFileMessage(file, content) {
-    const fileSize = this.formatFileSize(file.size);
-    let message = `上傳檔案:\n`;
-
-    if (content.type === 'image') {
-      message += `<div class="image-preview">
-        <img src="${content.data}" alt="${content.name}" />
-      </div>`;
-    } else {
-      message += '\n```' + this.getFileExtension(file.name) + '\n';
-      message += content.data;
-      message += '\n```\n';
-    }
-
-    return message;
-  }
-
   formatFileSize(bytes) {
     const units = ['B', 'KB', 'MB', 'GB'];
     let size = bytes;
@@ -966,24 +973,6 @@ class ChatBot {
     }
     
     return `${size.toFixed(1)} ${units[unitIndex]}`;
-  }
-
-  getFileExtension(filename) {
-    const ext = filename.split('.').pop().toLowerCase();
-    const languageMap = {
-      'js': 'javascript',
-      'py': 'python',
-      'rb': 'ruby',
-      'php': 'php',
-      'java': 'java',
-      'cpp': 'cpp',
-      'c': 'c',
-      'html': 'html',
-      'css': 'css',
-      'json': 'json',
-      'md': 'markdown'
-    };
-    return languageMap[ext] || ext;
   }
 
   initializeScreenshot() {
